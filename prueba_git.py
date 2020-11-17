@@ -12,7 +12,7 @@ import seaborn as sns
 from astropy.table import Table
 dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
 df = dat.to_pandas()
-print(type(df))
+#print(type(df))
 
 """
 from astropy.io import fits
@@ -23,4 +23,4 @@ import matplotlib.pyplot as plt
 
 archivo_fits = fits.open('Sharks_sgp_e_2_cat_small.fits') #open file
 """
-sns.jointplot(data=dat, x="ALPHA_J2000", y= "DELTA_J2000", kind=hex)
+sns.jointplot(data=pandas.DataFrame, x="ALPHA_J2000", y= "DELTA_J2000", kind=hex)
