@@ -12,7 +12,7 @@ import seaborn as sns
 from astropy.table import Table
 dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
 df = dat.to_pandas()
-#PRINT(type(df))
+#print(df)
 
 #Comment by Aurelio: necesitaras este import de pylab para poder ver la figura
 import pylab as pl
@@ -28,13 +28,22 @@ archivo_fits = fits.open('Sharks_sgp_e_2_cat_small.fits') #open file
 #Comment by Aurelio: el problema era que en data, tenias que poner tu DataFrame de entrada, en este caso: df, y de ahi se leen las columnas x,y. 
 #Igualmente, kind tiene que venir entre aspas o comillas, pues es un string.
 #Lo correcto sera:
-plot = sns.jointplot(data=df, x="ALPHA_J2000", y= "DELTA_J2000", kind='hex')
+#r= sns.jointplot(data=df, x="ALPHA_J2000", y= "DELTA_J2000", kind='hex')
 
 #Excercise: busca la documentacion de jointplot para ver como cambiar el nombre de los ejes, y en vez de ser ALPHA_J2000 y DELTA_J2000, que sea RA y DEC. Con tamano de fuente = 16. 
 #Una pista, la funcion se llama set_axis_labels
+x=dat.field('ALPHA_J2000')
+y=dat.field('DELTA_J2000')
+print(x, y)
+#r.set_axis_labels('RA', 'DEC')
 
 #Comment: estas siguiente linea hace que los margenes de los plots se ajusten a la figura
-pl.tight_layout()
+#pl.tight_layout()
 
 #Comment: este comando te muestra la figura, si en vez de eso, quieres guardarla, en vez de show(), debes usar la funcion savefig(). Busca informacion para ver como indicar el nombre del archivo de salida. Cuando tengas hecha la figura, formato jpg o png, me la puedes enviar por email y continuar con los siguientes ejercicios que te habia indicado.
-pl.show()
+#pl.savefig("Imagen apartado 4.jpg")
+
+from astropy import units as u
+from astropy.coordinates import SkyCoord
+c = SkyCoord(ra=x*u.degree, dec=y*u.degree, frame='icrs')
+#print (c)
