@@ -32,9 +32,7 @@ archivo_fits = fits.open('Sharks_sgp_e_2_cat_small.fits') #open file
 
 #Excercise: busca la documentacion de jointplot para ver como cambiar el nombre de los ejes, y en vez de ser ALPHA_J2000 y DELTA_J2000, que sea RA y DEC. Con tamano de fuente = 16. 
 #Una pista, la funcion se llama set_axis_labels
-x=dat.field('ALPHA_J2000')
-y=dat.field('DELTA_J2000')
-print(x, y)
+
 #r.set_axis_labels('RA', 'DEC')
 
 #Comment: estas siguiente linea hace que los margenes de los plots se ajusten a la figura
@@ -45,5 +43,14 @@ print(x, y)
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
-c = SkyCoord(ra=x*u.degree, dec=y*u.degree, frame='icrs')
-#print (c)
+x=dat.field('ALPHA_J2000')
+y=dat.field('DELTA_J2000')
+#print(x, y)
+c = SkyCoord(ra=x, dec=y, frame='icrs')
+galactic_coord=c.galactic
+print(galactic_coord)
+df["l"]=galactic_coord.l.deg
+df["b"]=galactic_coord.b.deg
+
+rg= sns.jointplot(data=df, x="l", y= "b", kind='hex')
+
