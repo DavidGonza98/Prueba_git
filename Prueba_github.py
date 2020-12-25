@@ -60,5 +60,5 @@ f.axes[3].set_position([0.55, 0.05, 0.4,  0.4])
 f.axes[4].set_position([0.55, 0.45, 0.4,  0.05])
 f.axes[5].set_position([0.95, 0.05, 0.05, 0.4])
 
-pl.savefig("Imagen apartado 5_b.jpg")
+#pl.savefig("Imagen apartado 5_b.jpg")
 
