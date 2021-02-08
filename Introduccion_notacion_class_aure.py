@@ -11,9 +11,6 @@ import seaborn as sns
 from matplotlib.pyplot import *
 from astropy.table import Table
 
-dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
-df = dat.to_pandas()
-
 
 from astropy import units as u
 from astropy.coordinates import SkyCoord
@@ -27,24 +24,35 @@ class file:
     
     def __init__(self, data):
         
-        data=df.columns
-    
+        self.columns =data.columns
+        print(self.columns)
+        self.pd = data
+
+'''
 class read_columns(file):
     
     def columns(self, name):
         
         name=data
-        
-class transform_to_lb (file):
-    
-    def coordinates(self, x, y):
-        x=dat.field('ALPHA_J2000')
-        y=dat.field('DELTA_J2000')
+'''
+
+class transform_to_lb ():
+    def __init__(self,file_object):
+        self.file_obj = file_object
+
+    def coordinates(self):
+        x=self.file_obj.pd['ALPHA_J2000']*u.degree
+        y=self.file_obj.pd['DELTA_J2000']*u.degree
         
         c = SkyCoord(ra=x, dec=y, frame='icrs')
         galactic_coord=c.galactic
-        df["l"]=galactic_coord.l.deg
-        df["b"]=galactic_coord.b.deg
+        self.file_obj.pd["l"]=galactic_coord.l.deg
+        self.file_obj.pd["b"]=galactic_coord.b.deg
+
+        temp_cols = Index(['l', 'b'], dtype='object')
+
+        self.file_obj.columns.append(temp_cols)
+        return self.file_obj
     
 class plot(file):
     
@@ -67,8 +75,15 @@ class plot(file):
     
        
        
-    
-    
+dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
+df = dat.to_pandas()
+
+f_ = file(df)
+
+tt = transform_to_lb(f_)
+
+new_file_class = tt.coordinates()
+
     
 
 
