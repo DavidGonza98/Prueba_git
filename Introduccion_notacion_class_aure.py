@@ -54,11 +54,13 @@ class transform_to_lb ():
         self.file_obj.columns.append(temp_cols)
         return self.file_obj
     
-class plot(file):
+class plot():
+    def __init__(self,file_object):
+        self.file_obj = file_object
     
     def get_plot(self, r, rg):
-        r= sns.jointplot(data=df, x="ALPHA_J2000", y= "DELTA_J2000", kind='hex')
-        rg= sns.jointplot(data=df, x="l", y= "b", kind='hex')
+        r= sns.jointplot(data=self.file_obj.pd, x="ALPHA_J2000", y= "DELTA_J2000", kind='hex')
+        rg= sns.jointplot(data=self.file_obj.pd, x="l", y= "b", kind='hex')
         
         #subplots migration
         f = pl.figure()
@@ -84,7 +86,7 @@ tt = transform_to_lb(f_)
 
 new_file_class = tt.coordinates()
 
-    
+#p=plot(f_)    
 
 
      
