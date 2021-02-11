@@ -5,7 +5,7 @@ Created on Thu Feb 11 18:04:55 2021
 @author: lpama
 """
 from astropy.table import Table
-from 
+import smatch
 
 
 dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
