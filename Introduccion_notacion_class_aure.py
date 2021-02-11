@@ -58,10 +58,15 @@ class plot():
     def __init__(self,file_object):
         self.file_obj = file_object
     
-    def get_plot(self, r, rg):
-        r= sns.jointplot(data=self.file_obj.pd, x="ALPHA_J2000", y= "DELTA_J2000", kind='hex')
+    def get_plot(self, x, y, savename):
+        r= sns.jointplot(data=self.file_obj.pd, x=x, y=y, kind='hex')
+
+        pl.savefig(savename)
+
+        '''
         rg= sns.jointplot(data=self.file_obj.pd, x="l", y= "b", kind='hex')
-        
+        pl.savefig('test2.png')
+
         #subplots migration
         f = pl.figure()
         for J in [r, rg]:
@@ -74,8 +79,8 @@ class plot():
         f.axes[3].set_position([0.55, 0.05, 0.4,  0.4])
         f.axes[4].set_position([0.55, 0.45, 0.4,  0.05])
         f.axes[5].set_position([0.95, 0.05, 0.05, 0.4])
-    
-       
+#        pl.savefig('test.png') 
+        '''
        
 dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
 df = dat.to_pandas()
@@ -86,9 +91,7 @@ tt = transform_to_lb(f_)
 
 new_file_class = tt.coordinates()
 
-#p=plot(f_)    
+p=plot(f_)    
+p.get_plot("ALPHA_J2000","DELTA_J2000","plot_radec.png")
+p.get_plot("l","b","plot_lb.png")
 
-
-     
-        
-        
