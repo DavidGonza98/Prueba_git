@@ -13,14 +13,14 @@ import seaborn as sns
 import pylab as plt
 import pandas as pd
 from matplotlib.pyplot import errorbar
-from scipy import optimize
+from scipy import optimize, stats
 
 dat = Table.read('Sharks_sgp_e_2_cat_small.fits', format='fits')
 df = dat.to_pandas()
 
 
 dat2= Table.read('2mass.fit', format='fits')
-df2 = dat.to_pandas()
+df2 = dat2.to_pandas()
 
 
 
@@ -66,7 +66,7 @@ for i in range(len(matches)):
 #plt.plot(kmag2matched, mag1matched, ".")
 #print (result)
 
-mask = kmag2_matched>12.3
+mask = (kmag2_matched>12.3)&(error_kmag2_matched>0)
 
 
 kmag2_mask = kmag2_matched[mask]
@@ -80,10 +80,11 @@ error_mag1_mask =  mag1_error_matched[mask]
 
 erro_kmag2_mask = error_kmag2_matched[mask]
 
-p = plt.polyfit(mag1_mask, kmag2_mask, 1)
+p = plt.polyfit(kmag2_mask, mag1_mask, 1)
 print(p[0], p[1])
 
-kmag2_mask_ajuste= p[0]*mag1_mask + p[1]
+mag1_mask_ajuste= p[0]*kmag2_mask + p[1]
+
 
 
 
@@ -119,24 +120,37 @@ errfunc = lambda p, x, y, err: (y - fitfunc(p, x)) / err
 #Poner aqui el error en leastsq
 
 pinit = [p[0], p[1]]
-out = optimize.leastsq(errfunc, pinit, args=(mag1_mask, kmag2_mask, error_mag1_mask), full_output=1)
+out = optimize.leastsq(errfunc, pinit, args=(kmag2_mask, mag1_mask,  erro_kmag2_mask), full_output=1)
 
 
 pfinal = out[0]
 covar = out[1]
 print (pfinal)
 
-print (error_kmag2_mask)
 
-error_kmag2_mask= pfinal[1]*mag1_mask + pfinal[0]
+ajuste_error_mag1_mask= pfinal[1]*kmag2_mask + pfinal[0]
+
+
+z = (kmag2_mask - ajuste_error_mag1_mask)/erro_kmag2_mask
+
+
+pf = pd.DataFrame(zip(mag1_mask, kmag2_mask))
+pf = pf[(np.abs(stats.zscore(pf)) < 2.5).all(axis=1)]
+m, b = plt.polyfit(pf[1], pf[0], 1)
+
+print(b, m)
+_ = plt.plot(pf[1], pf[0], 'o', label='Original data', markersize=2)
+_ = plt.plot(pf[1], m*pf[1] + b, 'r', label='Fitted line')
+_ = plt.legend()
+plt.show()
 
 plt.clf()
 plt.subplot(1, 1, 1)
-#plt.plot(kmag2matched, powerlaw(kmag2matched, amp, index))     # Fit
-plt.plot(mag1_mask, kmag2_mask_ajuste) # Azul
-plt.plot(mag1_mask, error_kmag2_mask) # Naranja
-plt.errorbar(mag1_mask, kmag2_mask, yerr=error_kmag2_mask, fmt='k.')  # Data
+plt.plot(kmag2_mask, mag1_mask_ajuste) # Azul
+plt.plot(kmag2_mask, ajuste_error_mag1_mask) # Naranja
+plt.errorbar(kmag2_mask, mag1_mask, yerr=erro_kmag2_mask, fmt='k.')  # Data
 plt.legend(('Ajuste lineal', 'Ajuste lineal con error', 'Valores con su error'))
 plt.title('Best Fit')
-plt.ylabel('KMAG (2MASS)')
-plt.xlabel('MAG_AUTO (SHARKS)')
+plt.xlabel('KMAG (2MASS)')
+plt.ylabel('MAG_AUTO (SHARKS)')
+

@@ -57,12 +57,14 @@ for i in range(len(matches)):
 
 
 
-#sns.distplot(cosgamma, kde=False)
-
+sns.distplot(cosgamma, kde=False)
+plt.savefig("Distancia_angular_entre_matches.jpg")
 #print(np.max(cosgamma))
 
-#result= sns.jointplot(x=kmag2matched, y=mag1matched, kind="reg", truncate=False, xlim=(5, 25), ylim=(5, 25), color="m", height=7)
-#plt.plot(kmag2matched, mag1matched, ".")
+result= sns.jointplot(x=kmag2matched, y=mag1matched, kind="reg", truncate=False, xlim=(5, 25), ylim=(5, 25), color="m", height=7)
+plt.plot(kmag2matched, mag1matched, ".")
+plt.savefig("Distancia_angular_entre_matches1.jpg")
+
 #print (result)
 
 mask = kmag2matched>12.3
@@ -77,6 +79,7 @@ errmag2Final =  ekmag2matched[mask]
 
 errmag1Final =  magger1matched[mask]
 
+ekmag2Final = ekmag2matched[mask]
 
 p = plt.polyfit(kmagFinal, mag1Final, 1)
 print(p[0], p[1])
@@ -109,9 +112,7 @@ dat.write('Sharks_sgp_e_2_cat_small.fits', overwrite=True)
 
 
 
-#plt.plot(ekmag2matched, magger1matchedajuste)
 
-#print (pp[0], pp[1])
 
 #kmagFinal, mag1Final
 
@@ -129,37 +130,22 @@ pfinal = out[0]
 covar = out[1]
 print (pfinal)
 print (covar)
-'''
-index = pfinal[1]
-amp = 10.0**pfinal[0]
-
-indexErr = np.sqrt( covar[1][1] )
-ampErr = np.sqrt( covar[0][0] ) * amp
-
-powerlaw = lambda kmag2matched, amp, index: amp * (kmag2matched**index)
-'''
+print (errmag1Final)
 
 mag1Finalerr= pfinal[1]*kmagFinal + pfinal[0]
 
 plt.clf()
 plt.subplot(1, 1, 1)
 #plt.plot(kmag2matched, powerlaw(kmag2matched, amp, index))     # Fit
-plt.plot(kmagFinal, mag1Finalajuste) #Azul
+plt.plot(kmagFinal, mag1Finalajuste) # Azul
 plt.plot(kmagFinal, mag1Finalerr) # Naranja
-plt.errorbar(kmagFinal, mag1Final, yerr=errmag1Final, fmt='k.')  # Data
+plt.errorbar(kmagFinal, mag1Final, yerr=errmag1Final, xerr=ekmag2Final, fmt='k.')  # Data
 plt.legend(('Ajuste lineal', 'Ajuste lineal con error', 'Valores con su error'))
 plt.title('Best Fit')
 plt.xlabel('KMAG (2MASS)')
 plt.ylabel('MAG_AUTO (SHARKS)')
+plt.savefig("Ajuste_lineal_con_errores.jpg")
 
-'''
-plt.subplot(2, 1, 2)
-#plt.loglog(kmag2matched, powerlaw(kmag2matched, amp, index))
-plt.errorbar(kmag2matched, mag1matched, yerr=magger1matched, fmt='k.')  # Data
-plt.xlabel('X (log scale)')
-plt.ylabel('Y (log scale)')
-#plt.xlim(1.0, 11)
-'''
 
 
 
