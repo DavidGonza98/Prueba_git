@@ -144,15 +144,17 @@ plt.clf()
 
 z = (mag1_mask - ajuste_error_mag1_mask )/erro_kmag2_mask
 
-pf = pd.DataFrame(zip(mag1_mask, kmag2_mask))
+pf = pd.DataFrame(zip(mag1_mask, kmag2_mask, erro_kmag2_mask))
+
 pf = pf[(np.abs(z) < 2.5)]
 #pf = pf[(np.abs(stats.zscore(pf)) < 2.5).all(axis=1)]
 print(len(mag1_mask), len(pf))
 m, b = plt.polyfit(pf[1], pf[0], 1)
 
 print(b, m)
-_ = plt.plot(pf[1], pf[0], 'o', label='Original data', markersize=2)
+#_ = plt.plot(pf[1], pf[0], 'o', label='Original data', markersize=2)
 _ = plt.plot(pf[1], m*pf[1] + b, 'r', label='Fitted line')
+_ = plt.errorbar(pf[1], pf[0], yerr=pf[2], fmt='k.', label='Original data with its error')
 _ = plt.legend()
 plt.savefig('ajuste_sin_outliers.png')
 
