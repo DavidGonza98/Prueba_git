@@ -130,7 +130,7 @@ covar = out[1]
 print (pfinal)
 
 ajuste_con_error_magnitud_sharks_mask = pfinal[1] * magnitud_2mass_mask + pfinal[0]
-
+'''
 plt.subplot(1, 1, 1)
 plt.plot(magnitud_2mass_mask, magnitud_sharks_mask_ajuste) # Azul
 plt.plot(magnitud_2mass_mask, ajuste_con_error_magnitud_sharks_mask) # Naranja
@@ -143,7 +143,7 @@ plt.savefig('ajuste_con_error.png')
 
 
 plt.clf()
-
+'''
 z = (magnitud_sharks_mask - ajuste_con_error_magnitud_sharks_mask )/magnitud_error_2mass_mask
 
 pf = pd.DataFrame(zip(magnitud_sharks_mask, magnitud_2mass_mask, magnitud_error_2mass_mask))
@@ -152,7 +152,7 @@ pf = pf[(np.abs(z) < 2.5)]
 #pf = pf[(np.abs(stats.zscore(pf)) < 2.5).all(axis=1)]
 print(len(magnitud_sharks_mask), len(pf))
 m, b = plt.polyfit(pf[1], pf[0], 1)
-
+'''
 print(b, m)
 #_ = plt.plot(pf[1], pf[0], 'o', label='Original data', markersize=2)
 _ = plt.plot(pf[1], m*pf[1] + b, 'r', label='Fitted line')
@@ -161,6 +161,19 @@ _ = plt.legend()
 plt.savefig('ajuste_sin_outliers.png')
 
 plt.show()
+'''
 
 
-plt.clf()
+fitfunc_sin_outliers = lambda pf, x: p[0] + p[1] * x
+errfunc_sin_outliers = lambda pf, x, y, err: (y - fitfunc_sin_outliers(pf, x)) / err
+
+pinit_sin_outliers = [pf[0], pf[1]]
+out_sin_outliers = optimize.leastsq(errfunc_sin_outliers, pinit_sin_outliers, args=(magnitud_2mass_mask, magnitud_sharks_mask,  magnitud_error_2mass_mask), full_output=1)
+
+pfinal_sin_outliers = out_sin_outliers[0]
+print(pfinal_sin_outliers)
+
+
+
+
+
