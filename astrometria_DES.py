@@ -150,7 +150,7 @@ pf = pd.DataFrame(zip(magnitud_sharks_mask, magnitud_2mass_mask, magnitud_error_
 
 pf = pf[(np.abs(z) < 2.5)]
 #pf = pf[(np.abs(stats.zscore(pf)) < 2.5).all(axis=1)]
-print(len(magnitud_sharks_mask), len(pf))
+#print(len(magnitud_sharks_mask), len(pf))
 m, b = plt.polyfit(pf[1], pf[0], 1)
 '''
 print(b, m)
@@ -164,16 +164,97 @@ plt.show()
 '''
 
 
-fitfunc_sin_outliers = lambda pf, x: p[0] + p[1] * x
-errfunc_sin_outliers = lambda pf, x, y, err: (y - fitfunc_sin_outliers(pf, x)) / err
-
-pinit_sin_outliers = [pf[0], pf[1]]
-out_sin_outliers = optimize.leastsq(errfunc_sin_outliers, pinit_sin_outliers, args=(magnitud_2mass_mask, magnitud_sharks_mask,  magnitud_error_2mass_mask), full_output=1)
+# Considerando errores y quitano outliers
+pinit_sin_outliers = [m, b]
+out_sin_outliers = optimize.leastsq(errfunc, pinit_sin_outliers, args=(pf[1], pf[0],  pf[2]), full_output=1)
 
 pfinal_sin_outliers = out_sin_outliers[0]
 print(pfinal_sin_outliers)
 
+ajuste_con_error_magnitud_sharks_mask_sin_outliers = pfinal_sin_outliers[1] * pf[1] + pfinal_sin_outliers[0]
+'''
+_ = plt.plot(pf[1], pf[0], 'o', label='Original data', markersize=2)
+_ = plt.plot(pf[1], ajuste_con_error_magnitud_sharks_mask_sin_outliers, 'r', label='Fitted line')
+_ = plt.errorbar(pf[1], pf[0], yerr=pf[2], fmt='k.', label='Original data with its error without outliers')
+_ = plt.legend()
+'''
+# para mask<15
+
+mask_15 = (magnitud_2mass_matched>15)&(magnitud_error_2mass_matched>0)
+
+magnitud_2mass_mask_15 = magnitud_2mass_matched[mask_15]
+
+magnitud_sharks_mask_15 = magnitud_sharks_matched[mask_15]
+
+magnitud_error_2mass_mask_15 =  magnitud_error_2mass_matched[mask_15]
+
+magnitud_error_sharks_mask_15 =  magnitud_error_sharks_matched[mask_15]
 
 
 
+p_15 = plt.polyfit(magnitud_2mass_mask_15, magnitud_sharks_mask_15, 1)
+print(p_15[0], p_15[1])
+
+magnitud_sharks_mask_ajuste_15= p_15[0]*magnitud_2mass_mask_15 + p_15[1]
+
+
+
+pinit_15 = [p_15[0], p_15[1]]
+out_15 = optimize.leastsq(errfunc, pinit_15, args=(magnitud_2mass_mask_15, magnitud_sharks_mask_15,  magnitud_error_2mass_mask_15), full_output=1)
+
+
+pfinal_15 = out_15[0]
+
+print (pfinal_15)
+
+ajuste_con_error_magnitud_sharks_mask_15 = pfinal_15[1] * magnitud_2mass_mask_15 + pfinal_15[0]
+
+
+z_15 = (magnitud_sharks_mask_15 - ajuste_con_error_magnitud_sharks_mask_15 )/magnitud_error_2mass_mask_15
+
+pf_15 = pd.DataFrame(zip(magnitud_sharks_mask_15, magnitud_2mass_mask_15, magnitud_error_2mass_mask_15))
+
+pf_15 = pf_15[(np.abs(z_15) < 2.5)]
+
+m_15, b_15 = plt.polyfit(pf_15[1], pf_15[0], 1)
+
+
+pinit_sin_outliers_15 = [m_15, b_15]
+out_sin_outliers_15 = optimize.leastsq(errfunc, pinit_sin_outliers, args=(pf_15[1], pf_15[0],  pf_15[2]), full_output=1)
+
+pfinal_sin_outliers_15 = out_sin_outliers[0]
+print(pfinal_sin_outliers_15)
+
+ajuste_con_error_magnitud_sharks_mask_sin_outliers_15 = pfinal_sin_outliers_15[1] * pf_15[1] + pfinal_sin_outliers_15[0]
+'''
+_ = plt.plot(pf_15[1], pf_15[0], 'o', label='Original data', markersize=2)
+_ = plt.plot(pf_15[1], ajuste_con_error_magnitud_sharks_mask_sin_outliers_15, 'r', label='Fitted line')
+_ = plt.errorbar(pf_15[1], pf_15[0], yerr=pf_15[2], fmt='k.', label='Original data with its error without outliers')
+_ = plt.legend()
+'''
+
+# Caso anterior pero con a=1
+b_15= pf_15[0] - pf_15[1]
+
+#print(b_15)
+
+pendiente_1=np.ones(len(b_15))
+fs = open('Tablas.fits', 'w')
+
+fs.write('Considerando errores y quitando outliers\n')
+
+#fs= Table.read('Tablas.fits', format='fits')
+fs.append['Pendiente']= pfinal_sin_outliers[1]
+fs['Ordenada']= pfinal_sin_outliers[0]
+
+fs.write('Límite en la magnitud magnitud_2mass_matched<15, considerando errores y quitando outliers')
+fs['Pendiente']= pfinal_sin_outliers_15[1]
+fs['Ordenada']= pfinal_sin_outliers_15[0]
+
+fs.write('Límite en la magnitud magnitud_2mass_matched<15, considerando errores y quitando outliers con a=1')
+fs['Pendiente']= pendiente_1
+fs['Ordenada']= b_15[0]
+
+fs.write('Tablas.fits', overwrite=True)
+fs.close()
 
